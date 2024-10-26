@@ -31,7 +31,8 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
       render: (_,row) => {
         return (
           <Button onClick={() => {selecionaPeca(row)}}
-            color='primary'>
+            style={{backgroundColor:'#52C41A'}}
+            type='primary'>
             Adicionar Peça
           </Button>
         )
