@@ -3,11 +3,13 @@ import { Row, Col, Modal, Table, Button, Input } from 'antd';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
-function ModalPecas({ children, peca='Peça', recebePeca }) {
+function ModalPecas({ children, peca = 'Peça', recebePeca }) {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pesquisa, setPesquisa] = useState('');
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
   const columns = [
     {
       title: 'Descrição',
@@ -19,159 +21,86 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
       dataIndex: 'valor',
       key: 'valor',
       width: 150,
-      render: (value) => {
-        return (
-          value.toFixed(2)
-        )
-      }
+      render: (value) => value.toFixed(2),
     },
     {
       title: '',
       width: 150,
-      render: (_,row) => {
-        return (
-          <Button onClick={() => {selecionaPeca(row)}}
-            style={{backgroundColor:'#52C41A'}}
-            type='primary'>
-            Adicionar Peça
-          </Button>
-        )
-      }
-    }
-  ]
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchPecas();
-    }, 1000)
-
-    return () => {clearTimeout(timeout);};
-  },[pesquisa]);
-
-  const modal = e => {
-    e.stopPropagation();
-    setVisible(true);
-    fetchPecas();
-  }
+      render: (_, row) => (
+        <Button
+          onClick={() => selecionaPeca(row)}
+          style={{ backgroundColor: '#52C41A', color: '#FFFFFF' }} 
+        >
+          Adicionar Peça
+        </Button>
+      ),
+    },
+  ];
 
   const fetchPecas = () => {
-    setLoading(true);
-    const params = new URLSearchParams({
-      pesquisa,
-    });
+    const pecas = [
+      { descricao: 'Componente 1 com a descrição técnica do mesmo', valor: 936.0 },
+      { descricao: 'Componente 2 com a descrição técnica do mesmo', valor: 1005.5 },
+      { descricao: 'Componente 3 com a descrição técnica do mesmo', valor: 783.99 },
+      { descricao: 'Componente 4 com a descrição técnica do mesmo', valor: 430.0 },
+      { descricao: 'Componente 5 com a descrição técnica do mesmo', valor: 2500.0 },
+    ];
+    setData(pecas);
+    setFilteredData(pecas); 
+  };
 
-    console.log('Teste')
+  useEffect(() => {
+    if (visible) fetchPecas();
+  }, [visible]);
 
-    setData([{
-      descricao: 'Componente 1 com a descrição técnica do mesmo',
-      valor: 936.00,
-      imagem: null,
-    },
-    {
-      descricao: 'Componente 2 com a descrição técnica do mesmo',
-      valor: 1005.50,
-      imagem: null,
-    },
-    {
-      descricao: 'Componente 3 com a descrição técnica do mesmo',
-      valor: 783.99,
-      imagem: null,
-    },
-    {
-      descricao: 'Componente 4 com a descrição técnica do mesmo',
-      valor: 430.00,
-      imagem: null,
-    },
-    {
-      descricao: 'Componente 5 com a descrição técnica do mesmo',
-      valor: 2500.00,
-      imagem: null,
-    }]);
-    
-    // fetch(`/pecas/'+peca+'?${params}`, { method: 'GET' }) 
-    //   .then((response) => {
-    //     if (!response.ok) {
-    //       throw new Error('Erro na requisição');
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((result) => {
-    //     setData(result);
-    //     setLoading(false);
-    //   })
-    //   .catch((error) => {
-    //     Modal.error({
-    //       title: 'Erro ao buscar peças',
-    //       content: error.message,
-    //       style: { whiteSpace: 'pre-wrap' }
-    //     });
-    //     setLoading(false);
-    //   });
+  useEffect(() => {
+    const filtered = data.filter((peca) =>
+      peca.descricao.toLowerCase().includes(pesquisa.toLowerCase())
+    );
+    setFilteredData(filtered);
+  }, [pesquisa, data]);
 
-    setLoading(false);
-  }
-
-  const selecionaPeca = (peca) => { 
-    setLoading(true);
-    console.log('peca',peca);    
+  const selecionaPeca = (peca) => {
     recebePeca(peca);
     setVisible(false);
-  }
+  };
 
   const afterClose = () => {
     setLoading(false);
-  }
+  };
 
   return (
     <span>
-      <span onClick={modal}>
+      <span onClick={(e) => { e.stopPropagation(); setVisible(true); }}>
         {children}
       </span>
-      <Modal open={visible}
+      <Modal
+        open={visible}
         title={peca}
-        width={1800}
-        okText='Salvar'
+        width={800}
         centered
         destroyOnClose
         afterClose={afterClose}
         onCancel={() => setVisible(false)}
-        footer={
-					<React.Fragment>
-							<Button onClick={() => setVisible(false)}>
-								Cancelar
-							</Button>
-					</React.Fragment>
-				}>
-        <Row gutter={[10,10]}
-          justify={'space-between'}>
+        footer={<Button onClick={() => setVisible(false)}>Cancelar</Button>}
+      >
+        <Row gutter={[10, 10]} justify="space-between">
           <Col span={20}>
-            <Row gutter={10}>
-              <Col span={22}>
-                <Input title='Pesquisar'
-                  placeholder='Pesquisar...'
-                  onChange={({target: {value}}) => {setPesquisa(value)}}/>
-              </Col>
-              <Col span={2}>
-                <Button >
-                  <SearchOutlined />
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-          <Col>
-            <Button color='primary'
-              variant='solid'>
-              <FilterOutlined />
-            </Button>
+            <Input
+              placeholder={`Pesquisar ${peca}...`}
+              value={pesquisa}
+              onChange={(e) => setPesquisa(e.target.value)}
+            />
           </Col>
           <Col span={24}>
-            <Table size='small'
+            <Table
+              size="small"
               columns={columns}
-              dataSource={data}
-              loading={loading}
-              rowKey={value => value?.descricao}
+              dataSource={filteredData}
+              rowKey={(value) => value.descricao}
               pagination={{ pageSize: 5 }}
-              bordered />
+              bordered
+            />
           </Col>
         </Row>
       </Modal>
@@ -181,7 +110,8 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
 
 ModalPecas.propTypes = {
   children: PropTypes.node,
-  recebePeca: PropTypes.node,
+  peca: PropTypes.string,
+  recebePeca: PropTypes.func.isRequired,
 };
 
 export default ModalPecas;
