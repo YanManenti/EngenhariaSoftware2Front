@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Modal, Table, Button, Input } from 'antd';
+import { Row, Col, Modal, Table, Button, Input, Popover, Checkbox } from 'antd';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
@@ -7,6 +7,7 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pesquisa, setPesquisa] = useState('');
+  const [filtro, setFiltro] = useState([]);
   const [data, setData] = useState([]);
   const columns = [
     {
@@ -54,13 +55,74 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
     fetchPecas();
   }
 
+  const alteraValor = (checked, i) => {
+    const nFiltro = [...filtro];
+
+    nFiltro[i].valor = checked;
+
+    setFiltro(nFiltro);
+  }
+
+  const setaItensFiltro = () => {
+    if (peca === 'Processador') {
+      setFiltro([
+        { nome: 'Intel', valor: false},
+        { nome: 'AMD', valor: false},
+      ]);
+    } else if (peca === 'Placa de Vídeo'){
+      setFiltro([
+        { nome: 'ASUS', valor: false},
+        { nome: 'NVIDIA', valor: false},
+        { nome: 'EVGA', valor: false},
+        { nome: 'GALAX', valor: false},
+        { nome: 'Gigabyte', valor: false},
+      ]);
+    }else if (peca === 'Placa Mãe'){
+      setFiltro([
+        { nome: 'ASUS', valor: false},
+        { nome: 'Gigabyte', valor: false},
+        { nome: 'MSI', valor: false},
+        { nome: 'ASRock', valor: false},
+      ]);
+    } else if (peca === 'Memória RAM'){
+      setFiltro([
+        { nome: 'Corsair', valor: false},
+        { nome: 'Kingston', valor: false},
+        { nome: 'XPG', valor: false},
+        { nome: 'Crucial', valor: false},
+      ]);
+    } else if (peca === 'Armazenamento'){
+      setFiltro([
+        { nome: 'Samsung', valor: false},
+        { nome: 'Kingston', valor: false},
+        { nome: 'SanDisk', valor: false},
+        { nome: 'Crucial', valor: false},
+      ]);
+    } else if (peca === 'Fonte'){
+      setFiltro([
+        { nome: 'Antec', valor: false},
+        { nome: 'Corsair', valor: false},
+        { nome: 'EVGA', valor: false},
+        { nome: 'Aerocool', valor: false},
+      ]);
+    } else if (peca === 'Gabinete'){
+      setFiltro([
+        { nome: 'Redragon', valor: false},
+        { nome: 'Razer', valor: false},
+        { nome: 'Pichau', valor: false},
+        { nome: 'NZXT', valor: false},
+      ]);
+    }
+  }
+
   const fetchPecas = () => {
     setLoading(true);
+
+    setaItensFiltro();
+
     const params = new URLSearchParams({
       pesquisa,
     });
-
-    console.log('Teste')
 
     setData([{
       descricao: 'Componente 1 com a descrição técnica do mesmo',
@@ -113,7 +175,6 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
 
   const selecionaPeca = (peca) => { 
     setLoading(true);
-    console.log('peca',peca);    
     recebePeca(peca);
     setVisible(false);
   }
@@ -159,10 +220,26 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
             </Row>
           </Col>
           <Col>
-            <Button color='primary'
-              variant='solid'>
-              <FilterOutlined />
-            </Button>
+            <Popover title='Filtro'
+              trigger="click"
+              placement='left'
+              content={
+                filtro.map((item, i) => (
+                  <Row>
+                    <Col>
+                      <Checkbox checked={item.valor}
+                        onChange={({target: {checked}}) => alteraValor(checked, i)}>
+                        {item.nome}
+                      </Checkbox>
+                    </Col>
+                  </Row>
+                ))
+              }>
+              <Button color='primary'
+                variant='solid'>
+                <FilterOutlined />
+              </Button>
+            </Popover>
           </Col>
           <Col span={24}>
             <Table size='small'
