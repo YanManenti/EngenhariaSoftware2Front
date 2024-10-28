@@ -3,12 +3,14 @@ import { Row, Col, Modal, Table, Button, Input, Popover, Checkbox } from 'antd';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
-function ModalPecas({ children, peca='Peça', recebePeca }) {
+function ModalPecas({ children, peca = 'Peça', recebePeca }) {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pesquisa, setPesquisa] = useState('');
   const [filtro, setFiltro] = useState([]);
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
   const columns = [
     {
       title: 'Descrição',
@@ -20,40 +22,21 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
       dataIndex: 'valor',
       key: 'valor',
       width: 150,
-      render: (value) => {
-        return (
-          value.toFixed(2)
-        )
-      }
+      render: (value) => value.toFixed(2),
     },
     {
       title: '',
       width: 150,
-      render: (_,row) => {
-        return (
-          <Button onClick={() => {selecionaPeca(row)}}
-            style={{backgroundColor:'#52C41A'}}
-            type='primary'>
-            Adicionar Peça
-          </Button>
-        )
-      }
-    }
-  ]
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchPecas();
-    }, 1000)
-
-    return () => {clearTimeout(timeout);};
-  },[pesquisa]);
-
-  const modal = e => {
-    e.stopPropagation();
-    setVisible(true);
-    fetchPecas();
-  }
+      render: (_, row) => (
+        <Button
+          onClick={() => selecionaPeca(row)}
+          style={{ backgroundColor: '#52C41A', color: '#FFFFFF' }} 
+        >
+          Adicionar Peça
+        </Button>
+      ),
+    },
+  ];
 
   const alteraValor = (checked, i) => {
     const nFiltro = [...filtro];
@@ -120,11 +103,7 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
 
     setaItensFiltro();
 
-    const params = new URLSearchParams({
-      pesquisa,
-    });
-
-    setData([{
+    const pecas = [{
       descricao: 'Componente 1 com a descrição técnica do mesmo',
       valor: 936.00,
       imagem: null,
@@ -148,8 +127,14 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
       descricao: 'Componente 5 com a descrição técnica do mesmo',
       valor: 2500.00,
       imagem: null,
-    }]);
+    }]
+
+    setData(pecas);
     
+    const params = new URLSearchParams({
+      pesquisa,
+    });
+
     // fetch(`/pecas/'+peca+'?${params}`, { method: 'GET' }) 
     //   .then((response) => {
     //     if (!response.ok) {
@@ -170,47 +155,57 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
     //     setLoading(false);
     //   });
 
+    setFilteredData(pecas); 
     setLoading(false);
   }
+
+  useEffect(() => {
+    if (visible) fetchPecas();
+  }, [visible]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const filtered = data.filter((peca) =>
+        peca.descricao.toLowerCase().includes(pesquisa.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }, 1000);
+
+    return () => {clearTimeout(timeout);};
+  }, [pesquisa, data]);
 
   const selecionaPeca = (peca) => { 
     setLoading(true);
     recebePeca(peca);
     setVisible(false);
-  }
+  };
 
   const afterClose = () => {
     setLoading(false);
-  }
+  };
 
   return (
     <span>
-      <span onClick={modal}>
+      <span onClick={(e) => { e.stopPropagation(); setVisible(true); }}>
         {children}
       </span>
-      <Modal open={visible}
+      <Modal
+        open={visible}
         title={peca}
-        width={1800}
-        okText='Salvar'
+        width={800}
         centered
         destroyOnClose
         afterClose={afterClose}
         onCancel={() => setVisible(false)}
-        footer={
-					<React.Fragment>
-							<Button onClick={() => setVisible(false)}>
-								Cancelar
-							</Button>
-					</React.Fragment>
-				}>
-        <Row gutter={[10,10]}
-          justify={'space-between'}>
+        footer={<Button onClick={() => setVisible(false)}>Cancelar</Button>}
+      >
+        <Row gutter={[10, 10]} justify="space-between">
           <Col span={20}>
             <Row gutter={10}>
               <Col span={22}>
-                <Input title='Pesquisar'
-                  placeholder='Pesquisar...'
-                  onChange={({target: {value}}) => {setPesquisa(value)}}/>
+                <Input placeholder={`Pesquisar ${peca}...`}
+                  value={pesquisa}
+                  onChange={(e) => setPesquisa(e.target.value)}/>
               </Col>
               <Col span={2}>
                 <Button >
@@ -242,13 +237,15 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
             </Popover>
           </Col>
           <Col span={24}>
-            <Table size='small'
+            <Table
+              size="small"
               columns={columns}
-              dataSource={data}
+              dataSource={filteredData}
               loading={loading}
-              rowKey={value => value?.descricao}
+              rowKey={(value) => value.descricao}
               pagination={{ pageSize: 5 }}
-              bordered />
+              bordered
+            />
           </Col>
         </Row>
       </Modal>
@@ -258,7 +255,8 @@ function ModalPecas({ children, peca='Peça', recebePeca }) {
 
 ModalPecas.propTypes = {
   children: PropTypes.node,
-  recebePeca: PropTypes.node,
+  peca: PropTypes.string,
+  recebePeca: PropTypes.func.isRequired,
 };
 
 export default ModalPecas;
