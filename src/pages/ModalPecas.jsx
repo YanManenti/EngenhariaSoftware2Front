@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Modal, Table, Button, Input, Popover, Checkbox } from 'antd';
-import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import { FilterOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
 function ModalPecas({ children, peca = 'Peça', recebePeca }) {
@@ -181,6 +181,7 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
   };
 
   const afterClose = () => {
+    setPesquisa('');
     setLoading(false);
   };
 
@@ -202,15 +203,10 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
         <Row gutter={[10, 10]} justify="space-between">
           <Col span={20}>
             <Row gutter={10}>
-              <Col span={22}>
+              <Col span={24}>
                 <Input placeholder={`Pesquisar ${peca}...`}
                   value={pesquisa}
                   onChange={(e) => setPesquisa(e.target.value)}/>
-              </Col>
-              <Col span={2}>
-                <Button >
-                  <SearchOutlined />
-                </Button>
               </Col>
             </Row>
           </Col>
