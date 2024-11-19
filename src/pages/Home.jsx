@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout, Button, List, Typography, Row, Col } from 'antd';
-import { PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import ModalPecas from './ModalPecas';
 
 const { Header, Content } = Layout;
@@ -41,8 +41,8 @@ const Home = () => {
 
   return (
     <Layout className="layout">
-      <Header style={{ backgroundColor: '#4a90e2', textAlign: 'center', padding: '10px' }}>
-        <Title style={{ color: '#000000', margin: 0 }}>Monte seu PC!</Title>
+      <Header style={{backgroundColor: 'transparent', textAlign: 'center', padding: '10px' }}>
+        <Title style={{ color: '#2d3277', margin: '20px', fontSize:'px', fontWeight: 'bold' }}>Monte seu PC!</Title>
       </Header>
       <Content style={{ padding: '20px', maxWidth: '100%', margin: '20px' }}>
         <Row justify="center" 
@@ -58,7 +58,7 @@ const Home = () => {
         </Row>
         <List dataSource={componentes}
           renderItem={(item, index) => (
-            <List.Item style={{ padding: '10px', backgroundColor: '#FADB14', marginBottom: '10px', borderRadius: '10px' }}>
+            <List.Item style={{padding: '10px', backgroundColor: '#f7d02c', marginBottom: '10px', borderRadius: '10px', border: '1px solid black'}}>
               <Row justify="start" 
                 align="middle"
                 style={{ width: '100%' }}>
@@ -72,9 +72,24 @@ const Home = () => {
                   <Col span={2}>
                     <ModalPecas peca={item.nome}
                       recebePeca={(valor) => adicionarPeca(index,valor)}>
-                      <Button shape="circle"
-                        icon={<PlusCircleOutlined />}
-                        style={{ backgroundColor: '#13C2C2', color: '#000000' }}/>
+<Button 
+  shape="circle"
+  icon={<PlusOutlined/>}
+  style={{
+    backgroundColor: '#ffffff', 
+    color: '#2d3277', 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    transition: 'transform 0.3s',
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = 'scale(1.2)';
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = 'scale(1)';
+  }}
+/>
                     </ModalPecas>
                   </Col>
                 : ''}
@@ -88,7 +103,7 @@ const Home = () => {
                       </Col>
                       <Col span={2}>
                         <Button shape="circle"
-                          icon={<MinusCircleOutlined />}
+                          icon={<MinusOutlined />}
                           style={{ backgroundColor: '#F5222D', color: '#000000' }}
                           onClick={() => {removerPeca(index)}}/>
                       </Col>
