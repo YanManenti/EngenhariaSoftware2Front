@@ -169,7 +169,7 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
         peca.descricao.toLowerCase().includes(pesquisa.toLowerCase())
       );
       setFilteredData(filtered);
-    }, 1000);
+    }, 100);
 
     return () => {clearTimeout(timeout);};
   }, [pesquisa, data]);
