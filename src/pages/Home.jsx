@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Layout, Button, List, Typography, Row, Col } from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import ModalPecas from './ModalPecas';
+import logo from '../images/logo_monta_ai.png';
 
 const { Header, Content } = Layout;
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const Home = () => {
-  const [total, setTotal] = useState(0.00);
+  const [total, setTotal] = useState(0.0);
   const [componentes, setComponentes] = useState([
     { nome: 'Processador', peca: {} },
     { nome: 'Placa de Vídeo', peca: {} },
@@ -19,117 +20,158 @@ const Home = () => {
   ]);
 
   const adicionarPeca = (i, retorno) => {
-    console.log('index', i);
-    console.log('retorno', retorno);
     const nComponentes = [...componentes];
-
     nComponentes[i].peca = retorno;
-
     setTotal(total + retorno.valor);
-
     setComponentes(nComponentes);
   };
 
   const removerPeca = (i) => {
     const nComponentes = [...componentes];
-
-    setTotal(total - nComponentes[i].peca.valor)
+    setTotal(total - nComponentes[i].peca.valor);
     nComponentes[i].peca = {};
-
     setComponentes(nComponentes);
-  }
+  };
 
   return (
-    <Layout className="layout">
-      <Header style={{ backgroundColor: 'transparent', textAlign: 'center', padding: '10px' }}>
-        <Title style={{ color: '#2d3277', margin: '20px', fontSize: 'px', fontWeight: 'bold' }}>Monte seu PC!</Title>
+    <Layout style={{ backgroundColor: '#282838', minHeight: '100vh' }}>
+      <Header
+        style={{
+          backgroundColor: '#010102',
+          padding: '10px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <img
+          src={logo}
+          alt="Logo Monta Aí"
+          style={{
+            height: '40px',
+            cursor: 'pointer',
+          }}
+        />
+        <div style={{ color: '#e8e5e7', fontSize: '14px' }}>
+          <Text style={{ marginRight: '10px' }}>Monte o seu PC sob medida!</Text>
+        </div>
       </Header>
-      <Content style={{ padding: '20px', maxWidth: '100%', margin: '20px' }}>
-        <Row justify="center"
-          style={{ marginBottom: '20px' }}>
-          <Col>
-            <div className="price-box">
-              <Title level={2}
-                style={{ textAlign: 'center', color: '#52C41A', padding: '10px', backgroundColor: '#002766', marginBottom: '10px', borderRadius: '10px' }}>
-                R$ {total.toFixed(2)}
-              </Title>
+
+      {/* Content */}
+      <Content style={{ padding: '20px' }}>
+        <List
+          header={
+            <div
+              style={{
+                color: '#e8e5e7',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                marginBottom: '20px',
+              }}
+            >
+              Selecione os componentes para montar o seu PC:
             </div>
-          </Col>
-        </Row>
-        <List dataSource={componentes}
+          }
+          footer={
+            <div
+              style={{
+                marginTop: '20px',
+                textAlign: 'right',
+                color: '#e8e5e7',
+                fontSize: '18px',
+                fontWeight: 'bold',
+              }}
+            >
+              Total: R$ {total.toFixed(2)}
+            </div>
+          }
+          dataSource={componentes}
           renderItem={(item, index) => (
-            <List.Item style={{ padding: '10px', backgroundColor: '#f7d02c', marginBottom: '10px', borderRadius: '10px', border: '1px solid black' }}>
-              <Row justify="start"
-                align="middle"
-                style={{ width: '100%' }}>
-                <Col span={3}>
-                  <Title level={4}
-                    style={{ margin: 0 }}>
+            <List.Item
+              style={{
+                backgroundColor: '#282838',
+                borderBottom: '1px solid #333347',
+                padding: '15px',
+              }}
+            >
+              <Row style={{ width: '100%' }} align="middle">
+                <Col span={6}>
+                  <Title
+                    level={5}
+                    style={{
+                      color: '#e8e5e7',
+                      margin: 0,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      if (!item?.peca?.descricao) {
+                        ModalPecas({ peca: item.nome, recebePeca: (valor) => adicionarPeca(index, valor) });
+                      }
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = '#2b86de'}
+                    onMouseLeave={(e) => e.target.style.color = '#e8e5e7'}
+                  >
                     {item.nome}
                   </Title>
                 </Col>
-                {!item?.peca?.descricao ?
-                  <Col span={2}>
-                    <ModalPecas peca={item.nome}
-                      recebePeca={(valor) => adicionarPeca(index, valor)}>
+                {!item?.peca?.descricao ? (
+                  <Col span={18} style={{ textAlign: 'right' }}>
+                    <ModalPecas
+                      peca={item.nome}
+                      recebePeca={(valor) => adicionarPeca(index, valor)}
+                    >
                       <Button
-                        shape="circle"
-                        icon={<PlusOutlined style={{ fontSize: '16px' }} />}
+                        type="primary"
+                        icon={<PlusOutlined />}
                         style={{
-                          backgroundColor: '#ffffff',
-                          color: '#2d3277',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          transition: 'all 0.3s ease',
+                          backgroundColor: '#2b86de',
+                          borderColor: '#2b86de',
+                          color: '#e8e5e7',
+                          transition: 'background-color 0.3s ease',
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'scale(1.2)';
-                          e.currentTarget.style.backgroundColor = '#52c41a';
-                          e.currentTarget.style.color = '#ffffff';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'scale(1)';
-                          e.currentTarget.style.backgroundColor = '#ffffff';
-                          e.currentTarget.style.color = '#2d3277';
-                        }}
-                      />
+                        onMouseEnter={(e) => (e.target.style.backgroundColor = '#1a6fa2')}
+                        onMouseLeave={(e) => (e.target.style.backgroundColor = '#2b86de')}
+                      >
+                        Escolher {item.nome}
+                      </Button>
                     </ModalPecas>
                   </Col>
-                  : ''}
-                {item?.peca?.descricao ?
-                  <React.Fragment>
-                    <Col span={16}>
-                      <label style={{ fontSize: 16 }}>{item?.peca.descricao}</label>
+                ) : (
+                  <>
+                    <Col span={12}>
+                      <span style={{ color: '#e8e5e7' }}>
+                        {item.peca.descricao}
+                      </span>
                     </Col>
-                    <Col span={3}>
-                      <label style={{ color: '#52C41A', fontSize: 24, fontWeight:'bold'}}>R$ {item?.peca?.valor.toFixed(2)}</label>
+                    <Col span={4} style={{ textAlign: 'right' }}>
+                      <span style={{ color: '#2b86de', fontWeight: 'bold' }}>
+                        R$ {item.peca.valor.toFixed(2)}
+                      </span>
                     </Col>
-                    <Col span={2}>
+                    <Col span={2} style={{ textAlign: 'right' }}>
                       <Button
-                        shape="circle"
-                        icon={<MinusOutlined style={{ fontSize: '16px' }} />}
+                        type="default"
+                        icon={<MinusOutlined />}
                         style={{
-                          backgroundColor: '#FFFFFF',
-                          color: '#000000',
-                          transition: 'all 0.3s ease',
-                          transform: 'scale(1)',
+                          backgroundColor: 'transparent',
+                          color: '#e8e5e7',
+                          borderColor: '#333347',
+                          transition: 'background-color 0.3s ease, color 0.3s ease',
                         }}
-                        onClick={() => { removerPeca(index); }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#F5222D';
-                          e.currentTarget.style.color = '#FFFFFF';
-                          e.currentTarget.style.transform = 'scale(1.1)';
+                          e.target.style.backgroundColor = '#d13434';
+                          e.target.style.color = '#fff';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#FFFFFF';
-                          e.currentTarget.style.color = '#000000';
-                          e.currentTarget.style.transform = 'scale(1)';
+                          e.target.style.backgroundColor = 'transparent';
+                          e.target.style.color = '#e8e5e7';
                         }}
+                        onClick={() => removerPeca(index)}
                       />
                     </Col>
-                  </React.Fragment>
-                  : ''}
+                  </>
+                )}
               </Row>
             </List.Item>
           )}
