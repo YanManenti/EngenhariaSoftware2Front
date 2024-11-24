@@ -4,7 +4,7 @@ import { FilterOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import BuscarValorProduto from './BuscaValorProduto';
 
-import './ModalPecas.css'; // Importando o arquivo CSS
+import './ModalPecas.css'; 
 
 function ModalPecas({ children, peca = 'Peça', recebePeca }) {
   const [visible, setVisible] = useState(false);
