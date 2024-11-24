@@ -25,7 +25,8 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
       render: (_, row, i) => 
       <BuscarValorProduto name={row.name}
         category={retornaCategoria(data)}
-        guardaValor={(el) => alteraValor(el, i)}/>,
+        guardaValor={(el) => alteraValor(el, i)}
+        permaLink={(el) => adicionaLink(el, i)}/>,
     },
     {
       title: '',
@@ -47,6 +48,16 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
     nData[i].price = price;
 
     console.log('valor',price);
+    
+    setData(nData);
+  }
+
+  const adicionaLink = (permalink, i) => {
+    const nData = [...data];
+
+    nData[i].permalink = permalink;
+
+    console.log('valor',permalink);
     
     setData(nData);
   }

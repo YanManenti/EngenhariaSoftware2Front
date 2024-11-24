@@ -142,7 +142,8 @@ const Home = () => {
                 ) : (
                   <>
                     <Col span={12}>
-                      <span style={{ color: '#e8e5e7' }}>
+                      <span style={{ color: '#e8e5e7' }}
+                        onClick={() => window.open(item.peca?.permalink, '_blank')}>
                         {item.peca.name}
                       </span>
                     </Col>

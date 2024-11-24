@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const BuscarValorProduto = ({ name, category, guardaValor }) => {
+const BuscarValorProduto = ({ name, category, guardaValor, permaLink }) => {
     const [valor, setValor] = useState();
     const [loading, setLoading] = useState(true);
 
@@ -21,6 +21,7 @@ const BuscarValorProduto = ({ name, category, guardaValor }) => {
                 console.log(result.results);
                 
                 guardaValor(result.results[0].price);
+                permaLink(result.results[0].permalink);
                 setValor(result.results[0].price);
             } catch (error) {
                 console.error('Erro ao buscar valor do produto:', error);
@@ -43,7 +44,8 @@ const BuscarValorProduto = ({ name, category, guardaValor }) => {
 BuscarValorProduto.propTypes = {
     name: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
-    guardaValor: PropTypes.func.isRequired,
+    guardaValor: PropTypes.func,
+    permaLink: PropTypes.string,
 };
 
 export default BuscarValorProduto;
