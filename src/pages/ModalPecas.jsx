@@ -4,6 +4,8 @@ import { FilterOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import BuscarValorProduto from './BuscaValorProduto';
 
+import './ModalPecas.css'; // Importando o arquivo CSS
+
 function ModalPecas({ children, peca = 'Peça', recebePeca }) {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,17 +18,21 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
       title: 'Descrição',
       dataIndex: 'name',
       key: 'name',
+      render: (text) => <span style={{ color: '#e8e5e7' }}>{text}</span>
     },
     {
       title: 'Valor',
       dataIndex: 'valor',
       key: 'valor',
       width: 150,
-      render: (_, row, i) => 
-      <BuscarValorProduto name={row.name}
-        category={retornaCategoria(data)}
-        guardaValor={(el) => alteraValor(el, i)}
-        permaLink={(el) => adicionaLink(el, i)}/>,
+      render: (_, row, i) => (
+        <BuscarValorProduto
+          name={row.name}
+          category={retornaCategoria(data)}
+          guardaValor={(el) => alteraValor(el, i)}
+          permaLink={(el) => adicionaLink(el, i)}
+        />
+      ),
     },
     {
       title: '',
@@ -34,7 +40,7 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
       render: (_, row) => (
         <Button
           onClick={() => selecionaPeca(row)}
-          style={{ backgroundColor: '#52C41A', color: '#FFFFFF' }} 
+          className="custom-button"
         >
           Adicionar Peça
         </Button>
@@ -44,58 +50,30 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
 
   const alteraValor = (price, i) => {
     const nData = [...data];
-
     nData[i].price = price;
-
-    console.log('valor',price);
-    
     setData(nData);
   }
 
   const adicionaLink = (permalink, i) => {
     const nData = [...data];
-
     nData[i].permalink = permalink;
-
-    console.log('valor',permalink);
-    
     setData(nData);
   }
 
   const alteraMarcador = (checked, i) => {
     const nFiltro = [...filtro];
-
     nFiltro[i].valor = checked;
-
     setFiltro(nFiltro);
   }
 
   const retornaCategoria = () => {    
-    //---CODIGO DAS CATEGORIAS---//  
-    // "cpu":"MLB1693",
-    // "cooler":"MLB2676",
-    // "fan":"MLB2676",
-    // "case":"MLB1696",
-    // "hard_drive":"MLB1672",
-    // "headphone":"MLB196208",
-    // "keyboard":"MLB418472",
-    // "memory":"MLB1694",
-    // "monitor":"MLB99245",
-    // "motherboard":"MLB1692",
-    // "gpu":"MLB1658",
-    // "mouse":"MLB1714",
-    // "psu":"MLB6777",
-    // "thermal_paste":"MLB63102",
-    // "webcam":"MLB73364",
-    // "stabilizers_and_ups":"MLB1718"
-
-    return peca == 'Processador' ? 'MLB1693' 
-      : peca == 'Placa de Vídeo' ? 'MLB1658'
-      : peca == 'Placa Mãe' ? 'MLB1692'
-      : peca == 'Memória RAM' ? 'MLB1694'
-      : peca == 'Armazenamento' ? 'MLB1672'
-      : peca == 'Fonte' ? 'MLB6777'
-      : peca == 'Gabinete' ? 'MLB1696' : '';
+    return peca === 'Processador' ? 'MLB1693' 
+      : peca === 'Placa de Vídeo' ? 'MLB1658'
+      : peca === 'Placa Mãe' ? 'MLB1692'
+      : peca === 'Memória RAM' ? 'MLB1694'
+      : peca === 'Armazenamento' ? 'MLB1672'
+      : peca === 'Fonte' ? 'MLB6777'
+      : peca === 'Gabinete' ? 'MLB1696' : '';
   }
 
   const setaItensFiltro = () => {
@@ -155,33 +133,33 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
 
     setaItensFiltro();
 
-    const requisicao = peca == 'Processador' ? 'cpu/all' 
-      : peca == 'Placa de Vídeo' ? 'gpu/all'
-      : peca == 'Placa Mãe' ? 'motherboard/all'
-      : peca == 'Memória RAM' ? 'memory/all'
-      : peca == 'Armazenamento' ? 'storage/all'
-      : peca == 'Fonte' ? 'powersupply/all'
-      : peca == 'Gabinete' ? 'case/all' : '';
-    
-    const params = new URLSearchParams({
-      pesquisa,
-    });    
+    const requisicao = peca === 'Processador' ? 'cpu/all' 
+      : peca === 'Placa de Vídeo' ? 'gpu/all'
+      : peca === 'Placa Mãe' ? 'motherboard/all'
+      : peca === 'Memória RAM' ? 'memory/all'
+      : peca === 'Armazenamento' ? 'storage/all'
+      : peca === 'Fonte' ? 'powersupply/all'
+      : peca === 'Gabinete' ? 'case/all' : '';
     
     try {
       const response = await fetch(`http://localhost:8081/api/${requisicao}`);
-      // const response = await fetch(`http://localhost:8081/api/${requisicao}?${params.toString()}`);
       if (!response.ok) {
         throw new Error(`Erro na requisição: ${response.statusText}`);
       }
-      
       const result = await response.json();
-      console.log(result);
-      
       setData(result);
     } catch (error) {
       Modal.error({
-        title: 'Erro ao buscar peças',
-        content: error.message,
+        title: (
+          <span style={{ color: '#e8e5e7' }}>
+            Erro ao buscar peças
+          </span>
+        ),
+        content: (
+          <span style={{ color: '#e8e5e7' }}>
+            Failed to fetch
+          </span>
+        ),
         style: { whiteSpace: 'pre-wrap' }
       });
     } finally {
@@ -193,21 +171,8 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
     if (visible) fetchPecas();
   }, [visible]);
 
-  // useEffect(() => {
-  //   const timeout = setTimeout(() => {
-  //     const filtered = data.filter((peca) =>
-  //       peca.descricao?.toLowerCase().includes(pesquisa?.toLowerCase())
-  //     );
-  //     setData(filtered);
-  //   }, 100);
-
-  //   return () => {clearTimeout(timeout);};
-  // }, [pesquisa, data]);
-
   const selecionaPeca = (peca) => { 
     setLoading(true);
-    console.log('peca', peca);
-    
     recebePeca(peca);
     setVisible(false);
   };
@@ -230,7 +195,7 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
         destroyOnClose
         afterClose={afterClose}
         onCancel={() => setVisible(false)}
-        footer={<Button onClick={() => setVisible(false)}>Cancelar</Button>}
+        footer={<Button onClick={() => setVisible(false)} className="custom-button">Cancelar</Button>}
       >
         <Row gutter={[10, 10]} justify="space-between">
           <Col span={20}>
@@ -238,28 +203,27 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
               <Col span={24}>
                 <Input placeholder={`Pesquisar ${peca}...`}
                   value={pesquisa}
-                  onChange={(e) => setPesquisa(e.target.value)}/>
+                  onChange={(e) => setPesquisa(e.target.value)} className="custom-input" />
               </Col>
             </Row>
           </Col>
           <Col>
-            <Popover title='Filtro'
+            <Popover title={<span style={{ color: '#e8e5e7' }}>Filtro</span>}
               trigger="click"
               placement='left'
               content={
                 filtro.map((item, i) => (
-                  <Row>
+                  <Row key={i}>
                     <Col>
                       <Checkbox checked={item.valor}
-                        onChange={({target: {checked}}) => alteraMarcador(checked, i)}>
-                        {item.nome}
+                        onChange={({ target: { checked } }) => alteraMarcador(checked, i)} className="custom-checkbox">
+                        <span style={{ color: '#e8e5e7' }}>{item.nome}</span>
                       </Checkbox>
                     </Col>
                   </Row>
                 ))
               }>
-              <Button color='primary'
-                variant='solid'>
+              <Button className="custom-button">
                 <FilterOutlined />
               </Button>
             </Popover>
@@ -273,6 +237,7 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
               rowKey={(value) => value.id}
               pagination={{ pageSize: 5 }}
               bordered
+              className="custom-table"
             />
           </Col>
         </Row>

@@ -1,0 +1,85 @@
+/* ModalPecas.css */
+.ant-modal-content {
+    background-color: #282838 !important;
+  }
+  
+  .ant-modal-header {
+    background-color: #282838 !important;
+    color: #e8e5e7 !important;
+  }
+  
+  .ant-modal-title, .ant-modal-body, .ant-modal-footer {
+    color: #e8e5e7 !important;
+    background-color: #282838 !important;
+  }
+  
+  .custom-button {
+    background-color: #2b86de !important;
+    color: #e8e5e7 !important;
+    border-color: #2b86de !important;
+  }
+  
+  .custom-button:hover {
+    background-color: #1a6fa2 !important;
+    border-color: #1a6fa2 !important;
+  }
+  
+  .custom-input {
+    background-color: #282838 !important;
+    color: #e8e5e7 !important;
+    border-color: #333347 !important;
+  }
+  
+  .custom-input::placeholder {
+    color: #e8e5e7 !important;
+  }
+  
+  .custom-checkbox .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #2b86de !important;
+    border-color: #2b86de !important;
+  }
+  
+  .ant-popover-inner {
+    background-color: #282838 !important;
+  }
+  
+  .ant-popover-inner-content {
+    color: #e8e5e7 !important;
+  }
+  
+  .ant-table {
+    background-color: #282838 !important;
+  }
+  
+  .ant-table-thead > tr > th {
+    background-color: #282838 !important;
+    color: #e8e5e7 !important;
+    border-bottom: 0.5px solid #e8e5e7 !important; /* Deixando as listras mais finas */
+  }
+  
+  .ant-table-tbody > tr > td {
+    background-color: #282838 !important;
+    color: #e8e5e7 !important;
+    border-bottom: 0.5px solid #e8e5e7 !important; /* Deixando as listras mais finas */
+  }
+  
+  .ant-checkbox-checked .ant-checkbox-inner {
+    background-color: #2b86de !important;
+    border-color: #2b86de !important;
+  }
+  
+  /* Estilo para a mensagem de erro */
+  .ant-modal .ant-modal-confirm-content {
+    color: #e8e5e7 !important;
+  }
+  
+  /* Estilo para os nomes dentro do filtro */
+  .ant-popover .ant-checkbox-wrapper .ant-checkbox + span {
+    color: #e8e5e7 !important;
+  }
+  
+  /* Estilo para o texto "No data" */
+  .ant-empty-description {
+    color: #e8e5e7 !important;
+  }
+  
