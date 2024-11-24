@@ -20,15 +20,17 @@ const Home = () => {
   ]);
 
   const adicionarPeca = (i, retorno) => {
+    console.log('retorno',retorno);
+    
     const nComponentes = [...componentes];
     nComponentes[i].peca = retorno;
-    setTotal(total + retorno.valor);
+    setTotal(total + retorno.price);
     setComponentes(nComponentes);
   };
 
   const removerPeca = (i) => {
     const nComponentes = [...componentes];
-    setTotal(total - nComponentes[i].peca.valor);
+    setTotal(total - nComponentes[i].peca.price);
     nComponentes[i].peca = {};
     setComponentes(nComponentes);
   };
@@ -105,7 +107,7 @@ const Home = () => {
                       cursor: 'pointer',
                     }}
                     onClick={() => {
-                      if (!item?.peca?.descricao) {
+                      if (!item?.peca?.name) {
                         ModalPecas({ peca: item.nome, recebePeca: (valor) => adicionarPeca(index, valor) });
                       }
                     }}
@@ -115,7 +117,7 @@ const Home = () => {
                     {item.nome}
                   </Title>
                 </Col>
-                {!item?.peca?.descricao ? (
+                {!item?.peca?.name ? (
                   <Col span={18} style={{ textAlign: 'right' }}>
                     <ModalPecas
                       peca={item.nome}
@@ -141,12 +143,12 @@ const Home = () => {
                   <>
                     <Col span={12}>
                       <span style={{ color: '#e8e5e7' }}>
-                        {item.peca.descricao}
+                        {item.peca.name}
                       </span>
                     </Col>
                     <Col span={4} style={{ textAlign: 'right' }}>
                       <span style={{ color: '#2b86de', fontWeight: 'bold' }}>
-                        R$ {item.peca.valor.toFixed(2)}
+                        R$ {item.peca.price?.toFixed(2)}
                       </span>
                     </Col>
                     <Col span={2} style={{ textAlign: 'right' }}>

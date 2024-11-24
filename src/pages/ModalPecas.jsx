@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Modal, Table, Button, Input, Popover, Checkbox } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
+import BuscarValorProduto from './BuscaValorProduto';
 
 function ModalPecas({ children, peca = 'Peça', recebePeca }) {
   const [visible, setVisible] = useState(false);
@@ -9,20 +10,22 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
   const [pesquisa, setPesquisa] = useState('');
   const [filtro, setFiltro] = useState([]);
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
 
   const columns = [
     {
       title: 'Descrição',
-      dataIndex: 'descricao',
-      key: 'descricao',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: 'Valor',
       dataIndex: 'valor',
       key: 'valor',
       width: 150,
-      render: (value) => value.toFixed(2),
+      render: (_, row, i) => 
+      <BuscarValorProduto name={row.name}
+        category={retornaCategoria(data)}
+        guardaValor={(el) => alteraValor(el, i)}/>,
     },
     {
       title: '',
@@ -38,12 +41,50 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
     },
   ];
 
-  const alteraValor = (checked, i) => {
+  const alteraValor = (price, i) => {
+    const nData = [...data];
+
+    nData[i].price = price;
+
+    console.log('valor',price);
+    
+    setData(nData);
+  }
+
+  const alteraMarcador = (checked, i) => {
     const nFiltro = [...filtro];
 
     nFiltro[i].valor = checked;
 
     setFiltro(nFiltro);
+  }
+
+  const retornaCategoria = () => {    
+    //---CODIGO DAS CATEGORIAS---//  
+    // "cpu":"MLB1693",
+    // "cooler":"MLB2676",
+    // "fan":"MLB2676",
+    // "case":"MLB1696",
+    // "hard_drive":"MLB1672",
+    // "headphone":"MLB196208",
+    // "keyboard":"MLB418472",
+    // "memory":"MLB1694",
+    // "monitor":"MLB99245",
+    // "motherboard":"MLB1692",
+    // "gpu":"MLB1658",
+    // "mouse":"MLB1714",
+    // "psu":"MLB6777",
+    // "thermal_paste":"MLB63102",
+    // "webcam":"MLB73364",
+    // "stabilizers_and_ups":"MLB1718"
+
+    return peca == 'Processador' ? 'MLB1693' 
+      : peca == 'Placa de Vídeo' ? 'MLB1658'
+      : peca == 'Placa Mãe' ? 'MLB1692'
+      : peca == 'Memória RAM' ? 'MLB1694'
+      : peca == 'Armazenamento' ? 'MLB1672'
+      : peca == 'Fonte' ? 'MLB6777'
+      : peca == 'Gabinete' ? 'MLB1696' : '';
   }
 
   const setaItensFiltro = () => {
@@ -98,84 +139,64 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
     }
   }
 
-  const fetchPecas = () => {
+  const fetchPecas = async () => {
     setLoading(true);
 
     setaItensFiltro();
 
-    const pecas = [{
-      descricao: 'Componente 1 com a descrição técnica do mesmo',
-      valor: 936.00,
-      imagem: null,
-    },
-    {
-      descricao: 'Componente 2 com a descrição técnica do mesmo',
-      valor: 1005.50,
-      imagem: null,
-    },
-    {
-      descricao: 'Componente 3 com a descrição técnica do mesmo',
-      valor: 783.99,
-      imagem: null,
-    },
-    {
-      descricao: 'Componente 4 com a descrição técnica do mesmo',
-      valor: 430.00,
-      imagem: null,
-    },
-    {
-      descricao: 'Componente 5 com a descrição técnica do mesmo',
-      valor: 2500.00,
-      imagem: null,
-    }]
-
-    setData(pecas);
+    const requisicao = peca == 'Processador' ? 'cpu/all' 
+      : peca == 'Placa de Vídeo' ? 'gpu/all'
+      : peca == 'Placa Mãe' ? 'motherboard/all'
+      : peca == 'Memória RAM' ? 'memory/all'
+      : peca == 'Armazenamento' ? 'storage/all'
+      : peca == 'Fonte' ? 'powersupply/all'
+      : peca == 'Gabinete' ? 'case/all' : '';
     
     const params = new URLSearchParams({
       pesquisa,
-    });
-
-    // fetch(`/pecas/'+peca+'?${params}`, { method: 'GET' }) 
-    //   .then((response) => {
-    //     if (!response.ok) {
-    //       throw new Error('Erro na requisição');
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((result) => {
-    //     setData(result);
-    //     setLoading(false);
-    //   })
-    //   .catch((error) => {
-    //     Modal.error({
-    //       title: 'Erro ao buscar peças',
-    //       content: error.message,
-    //       style: { whiteSpace: 'pre-wrap' }
-    //     });
-    //     setLoading(false);
-    //   });
-
-    setFilteredData(pecas); 
-    setLoading(false);
+    });    
+    
+    try {
+      const response = await fetch(`http://localhost:8081/api/${requisicao}`);
+      // const response = await fetch(`http://localhost:8081/api/${requisicao}?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`Erro na requisição: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      console.log(result);
+      
+      setData(result);
+    } catch (error) {
+      Modal.error({
+        title: 'Erro ao buscar peças',
+        content: error.message,
+        style: { whiteSpace: 'pre-wrap' }
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
     if (visible) fetchPecas();
   }, [visible]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const filtered = data.filter((peca) =>
-        peca.descricao.toLowerCase().includes(pesquisa.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }, 100);
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     const filtered = data.filter((peca) =>
+  //       peca.descricao?.toLowerCase().includes(pesquisa?.toLowerCase())
+  //     );
+  //     setData(filtered);
+  //   }, 100);
 
-    return () => {clearTimeout(timeout);};
-  }, [pesquisa, data]);
+  //   return () => {clearTimeout(timeout);};
+  // }, [pesquisa, data]);
 
   const selecionaPeca = (peca) => { 
     setLoading(true);
+    console.log('peca', peca);
+    
     recebePeca(peca);
     setVisible(false);
   };
@@ -219,7 +240,7 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
                   <Row>
                     <Col>
                       <Checkbox checked={item.valor}
-                        onChange={({target: {checked}}) => alteraValor(checked, i)}>
+                        onChange={({target: {checked}}) => alteraMarcador(checked, i)}>
                         {item.nome}
                       </Checkbox>
                     </Col>
@@ -236,9 +257,9 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
             <Table
               size="small"
               columns={columns}
-              dataSource={filteredData}
+              dataSource={data}
               loading={loading}
-              rowKey={(value) => value.descricao}
+              rowKey={(value) => value.id}
               pagination={{ pageSize: 5 }}
               bordered
             />
