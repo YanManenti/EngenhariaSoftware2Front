@@ -30,7 +30,7 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
           name={row.name}
           category={retornaCategoria(data)}
           guardaValor={(el) => alteraValor(el, row.id)}
-          permaLink={(el) => adicionaLink(el, i)}
+          permaLink={(el) => adicionaLink(el, row.id)}
         />
       ),
     },
@@ -60,10 +60,15 @@ function ModalPecas({ children, peca = 'Peça', recebePeca }) {
     setData(nData);
   }
 
-  const adicionaLink = (permalink, i) => {
+  const adicionaLink = (permalink, id) => {
+
     const nData = [...data];
-    nData[i].permalink = permalink;
-    setData(nData);
+    const index = nData.findIndex(item => item.id === id);
+
+    if (index !== -1) {
+      nData[index].permalink = permalink;
+      setData(nData);
+    }
   }
 
   const alteraMarcador = (checked, i) => {
