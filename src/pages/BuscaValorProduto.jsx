@@ -45,7 +45,7 @@ BuscarValorProduto.propTypes = {
     name: PropTypes.string.isRequired,
     category: PropTypes.string.isRequired,
     guardaValor: PropTypes.func,
-    permaLink: PropTypes.string,
+    permaLink: PropTypes.func,
 };
 
 export default BuscarValorProduto;
