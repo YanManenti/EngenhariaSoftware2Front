@@ -1,10 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Col, Layout, List, Row, Select, Typography} from 'antd';
-import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
-import ModalPecas from '../components/ModalPecas';
+import {Layout, Typography} from 'antd';
 import logo from '../images/logo_monta_ai.png';
-import {Computer} from "../models/Computer";
-import {Case} from "../models/Case";
 import Peca from "../components/Peca";
 
 const {Header, Content} = Layout;
@@ -21,99 +17,132 @@ const Home = () => {
         {nome: 'Armazenamento', peca: {}},
         {nome: 'Fonte', peca: {}},
         {nome: 'Gabinete', peca: {}},
+        {nome: 'Pasta Térmica', peca: {}},
+        {nome: 'Ventoinha', peca: {}},
+        {nome: 'Cooler para Processador', peca: {}}
     ]);
 
-  const adicionarPeca = (i, retorno) => {
-    console.log('retorno',retorno);
+    const adicionarPeca = (i, nome, retorno) => {
+        const index = componentes.map(e => e.nome).indexOf(nome);
+        const nComponentes = [...componentes];
+        nComponentes[index].peca=retorno;
+        setTotal(total + retorno.price);
+        setComponentes(nComponentes);
+    };
 
-    const nComponentes = [...componentes];
-    nComponentes[i].peca = retorno;
-    setTotal(total + retorno.price);
-    setComponentes(nComponentes);
-  };
+    const removerPeca = (nome) => {
+        const nComponentes = [...componentes];
+        const index = nComponentes.map(e => e.nome).indexOf(nome);
+        setTotal((current)=>{
+            let newTotal = total - nComponentes[index].peca.price;
+            if(newTotal <= 2.2737367544323206e-13 || isNaN(newTotal)){
+                newTotal = 0
+            }
+            return newTotal;
+        });
+        nComponentes[index].peca = {};
+        setComponentes(nComponentes);
+    };
 
-  const removerPeca = (i) => {
-    const nComponentes = [...componentes];
-    setTotal(total - nComponentes[i].peca.price);
-    nComponentes[i].peca = {};
-    setComponentes(nComponentes);
-  };
-
-    const setPecaComputador = (nome,computador,peca)=>{
+    const setPecaComputador = (nome, computador, peca) => {
         const newComputador = {...computador}
         newComputador[nome] = peca;
-        if(peca === null){
+        if (peca === null) {
             delete newComputador[nome];
         }
-        console.log('nome: ',nome,'computador: ',computador,'peca: ',peca);
         setComputador(newComputador);
     }
 
-    const calcularPotencia=(cpuTdp, gpuTdp)=>{
-        console.log(parseInt(cpuTdp) + parseInt(gpuTdp))
-        return 2*parseInt(cpuTdp) + parseInt(gpuTdp) + 150;
+    const calcularPotencia = (cpuTdp, gpuTdp) => {
+        return Math.floor(1.5 * parseInt(cpuTdp) + 1.5 * parseInt(gpuTdp) + 100);
     }
 
-  return (
-    <Layout style={{ backgroundColor: '#282838', minHeight: '100vh' }}>
-      <Header
-        style={{
-          backgroundColor: '#010102',
-          padding: '10px 20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <img
-          src={logo}
-          alt="Logo Monta Aí"
-          style={{
-            height: '40px',
-            cursor: 'pointer',
-          }}
-        />
-        <div style={{ color: '#e8e5e7', fontSize: '14px' }}>
-          <Text style={{ marginRight: '10px' }}>Monte o seu PC sob medida!</Text>
-        </div>
-      </Header>
-            <div
+    return (
+        <Layout style={{backgroundColor: '#282838', minHeight: '100vh'}}>
+            <Header
                 style={{
-                    color: '#e8e5e7',
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    marginBottom: '20px',
+                    backgroundColor: '#010102',
+                    padding: '10px 20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                 }}
             >
-              Selecione os componentes para montar o seu PC:
+                <img
+                    src={logo}
+                    alt="Logo Monta Aí"
+                    style={{
+                        height: '40px',
+                        cursor: 'pointer',
+                    }}
+                />
+                <div style={{color: '#e8e5e7', fontSize: '14px'}}>
+                    <Text style={{marginRight: '10px'}}>Monte o seu PC sob medida!</Text>
+                </div>
+            </Header>
+            <div
+                style={{
+                    margin: '35px',
+                    textAlign: 'right',
+                    color: '#e8e5e7',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent:'space-between',
+                    fontWeight: 'bold',
+                    fontSize: '26px'
+                }}
+            >
+                <p style={{margin:'0'}}>Selecione os componentes para montar o seu PC:</p>
+                <div style={{display:'flex', flexDirection:'column', gap:'5px'}}>
+                <p style={{margin:'0'}}>TOTAL: <span style={{color:'#08a003'}}>R$ {total.toFixed(2)}</span></p>
+                    {total>0 ? <p style={{margin:'0', fontSize: '18px'}}>ou 10x R$ {(total/10).toFixed(2)}</p> : <></>}
+                </div>
             </div>
-            {/* Content */}
-            <Content style={{padding: '20px'}}>
-                <Peca computador={computador} item={computador.case} setPecaComputador={setPecaComputador} nome="Gabinete" api="case" />
-                <Peca computador={computador} item={computador.cpu} setPecaComputador={setPecaComputador} nome="Processador" api="cpu" />
-                <Peca computador={computador} item={computador.motherboard} setPecaComputador={setPecaComputador} nome="Placa Mãe" api="motherboard" />
-                <Peca computador={computador} item={computador.memory} setPecaComputador={setPecaComputador} nome="Memória" api="memory" />
-                <Peca computador={computador} item={computador.gpu} setPecaComputador={setPecaComputador} nome="Placa Gráfica" api="gpu" />
-                <Peca computador={computador} item={computador.storage} setPecaComputador={setPecaComputador} nome="Armazenamento" api="storage" />
-                <Peca computador={computador} item={computador.powersupply} setPecaComputador={setPecaComputador} nome="Fonte" api="powersupply" />
-                <Peca computador={computador} item={computador.cpucooler} setPecaComputador={setPecaComputador} nome="Cooler para Processador" api="cpucooler" />
-                <Peca computador={computador} item={computador.fan} setPecaComputador={setPecaComputador} nome="Ventoinha" api="fan" />
-                <Peca computador={computador} item={computador.thermalpaste} setPecaComputador={setPecaComputador} nome="Pasta Térmica" api="thermalpaste" />
+            <Content style={{padding: '0 20px 20px 20px'}}>
+                <Peca computador={computador} item={computador.case} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[6]}
+                      nome="Gabinete"
+                      api="case"/>
+                <Peca computador={computador} item={computador.cpu} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[0]}
+                      nome="Processador" api="cpu"/>
+                <Peca computador={computador} item={computador.motherboard} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[2]}
+                      nome="Placa Mãe" api="motherboard"/>
+                <Peca computador={computador} item={computador.memory} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[3]}
+                      nome="Memória RAM" api="memory"/>
+                <Peca computador={computador} item={computador.gpu} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[1]}
+                      nome="Placa de Vídeo" api="gpu"/>
+                <Peca computador={computador} item={computador.storage} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[4]}
+                      nome="Armazenamento" api="storage"/>
+
                 <div
                     style={{
-                        marginTop: '20px',
+                        marginRight: '16px',
                         textAlign: 'right',
                         color: '#e8e5e7',
-                        fontSize: '18px',
                         fontWeight: 'bold',
-                        display: 'flex',
-                        flexDirection: 'column',
+                        fontSize: '24px'
                     }}
-                >
-                    {computador?.cpu?.tdp && computador?.gpu?.tdp ? <p>Potência recomendada para Fonte: {calcularPotencia(computador.cpu.tdp,computador.gpu.tdp)} W</p> : <>{calcularPotencia(computador?.cpu?.tdp,computador?.gpu?.tdp)}</>}
-                    <p>Total: R$ {total.toFixed(2)}</p>
-                </div>
+                >{computador?.cpu?.tdp && computador?.gpu?.tdp ? <p style={{margin:'0'}}>Potência recomendada para
+                    Fonte: {calcularPotencia(computador.cpu.tdp, computador.gpu.tdp)} W</p> : <></>}</div>
+                    <Peca computador={computador} item={computador.powersupply} setPecaComputador={setPecaComputador}
+                          adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[5]}
+                          nome="Fonte"
+                          api="powersupply"/>
+                    <Peca computador={computador} item={computador.cpucooler} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[9]}
+                      nome="Cooler para Processador" api="cpucooler"/>
+                <Peca computador={computador} item={computador.fan} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[8]}
+                      nome="Ventoinha" api="fan"/>
+                <Peca computador={computador} item={computador.thermalpaste} setPecaComputador={setPecaComputador}
+                      adicionarPeca={adicionarPeca} removerPeca={removerPeca} componente={componentes[7]}
+                      nome="Pasta Térmica" api="thermalpaste"/>
+
             </Content>
         </Layout>
     );

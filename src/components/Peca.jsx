@@ -6,8 +6,12 @@ import React, {useEffect, useState} from "react";
 import {Typography} from "antd";
 const { Title } = Typography;
 
-function Peca({computador, item, api, nome, setPecaComputador}) {
 
+import Link from '../images/link.svg'
+
+
+
+function Peca({computador, item, api, nome, componente, setPecaComputador, adicionarPeca, removerPeca}) {
     const [options, setOptions] = useState([]);
     useEffect(() => {
         const computerBody = Object.keys(computador).length ? {...computador} : {}
@@ -41,8 +45,8 @@ function Peca({computador, item, api, nome, setPecaComputador}) {
             borderBottom: '1px solid #333347',
             padding: '15px',
         }}>
-        <Row style={{width: '100%'}} align="middle">
-            <Col span={6}>
+        <Row style={{ width: '100%' }} align="middle">
+            <Col span={3}>
                 <Title
                     level={5}
                     style={{
@@ -50,25 +54,14 @@ function Peca({computador, item, api, nome, setPecaComputador}) {
                         margin: 0,
                         cursor: 'pointer',
                     }}
-                    onClick={() => {
-                        if (!item?.id) {
-                            ModalPecas({peca: item.Name, recebePeca: (valor) => adicionarPeca(index, valor)});
-                        }
-                    }}
                     onMouseEnter={(e) => e.target.style.color = '#2b86de'}
                     onMouseLeave={(e) => e.target.style.color = '#e8e5e7'}
                 >
                     {nome}
                 </Title>
             </Col>
-            {!item?.peca?.descricao ? (
-                <Col span={18} style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    gap: '10px'
-                }}>
+            {componente?.peca?.price === undefined ? (
+                <Col span={21} style={{ display: 'flex', justifyContent: 'flex-end', alignContent: 'center', gap: '10px' }}>
                     <Select
                         style={{width: '340'}}
                         showSearch
@@ -77,15 +70,17 @@ function Peca({computador, item, api, nome, setPecaComputador}) {
                         onChange={(_, option) => setPecaComputador(`${api}`,computador,option)}
                         options={options}
                         allowClear={true}
-                        onClear={() => setPecaComputador(`${api}`,computador,null)}
+                        virtual={true}
+                        onClear={() => {setPecaComputador(`${api}`,computador,null);}}
                     />
                     <ModalPecas
                         peca={nome}
-                        recebePeca={(valor) => adicionarPeca(index, valor)}
+                        nome={computador[api]?.name}
+                        recebePeca={(valor) => adicionarPeca(computador[api]?.name, nome,valor)}
                     >
                         <Button
                             type="primary"
-                            icon={<PlusOutlined/>}
+                            icon={<PlusOutlined />}
                             style={{
                                 backgroundColor: '#2b86de',
                                 borderColor: '#2b86de',
@@ -101,20 +96,40 @@ function Peca({computador, item, api, nome, setPecaComputador}) {
                 </Col>
             ) : (
                 <>
-                    <Col span={12}>
-                      <span style={{color: '#e8e5e7'}}>
-                        {item.peca.descricao}
+                    <Col span={2} >
+                        <img style={{borderRadius: '10px'}} src={componente.peca.thumbnail} alt="thumbnail"/>
+                    </Col>
+                    <Col span={13} style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        flexDirection: 'column',
+                        gap: '10px',
+                    }}>
+                      <span style={{color: '#e8e5e7', fontWeight: 'bold', cursor: 'pointer'}}
+                            onClick={() => window.open(componente.peca?.permalink, '_blank')}>
+                        {componente.peca.title}<
+                          img
+                          src = {Link}
+                          style={{height: '25px',width:'25px'}}
+                      />
+                      </span>
+                        <span style={{color: '#e8e5e7'}}>
+                        Status: {componente.peca?.condition==="new" ? "Novo" : "Usado"}
+                      </span>
+                        <span style={{color: '#e8e5e7'}}>
+                            Origem: {componente.peca.address.city_name}
                       </span>
                     </Col>
-                    <Col span={4} style={{textAlign: 'right'}}>
-                      <span style={{color: '#2b86de', fontWeight: 'bold'}}>
-                        R$ {item.peca.valor.toFixed(2)}
+                    <Col span={5} style={{textAlign: 'right'}}>
+                      <span style={{color: '#2b86de', fontWeight: 'bold', fontSize: '30px'}}>
+                        R$ {componente.peca.price?.toFixed(2)}
                       </span>
                     </Col>
-                    <Col span={2} style={{textAlign: 'right'}}>
+                    <Col span={1} style={{ textAlign: 'right' }}>
                         <Button
                             type="default"
-                            icon={<MinusOutlined/>}
+                            icon={<MinusOutlined />}
                             style={{
                                 backgroundColor: 'transparent',
                                 color: '#e8e5e7',
@@ -129,7 +144,7 @@ function Peca({computador, item, api, nome, setPecaComputador}) {
                                 e.target.style.backgroundColor = 'transparent';
                                 e.target.style.color = '#e8e5e7';
                             }}
-                            onClick={() => removerPeca(index)}
+                            onClick={() => {removerPeca(nome);setPecaComputador(`${api}`,computador,null);}}
                         />
                     </Col>
                 </>
