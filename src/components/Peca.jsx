@@ -1,6 +1,5 @@
 import {Button, Col, Row, Select} from "antd";
 import ModalPecas from "./ModalPecas";
-import {Case} from "../models/Case";
 import {MinusOutlined, PlusOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import {Typography} from "antd";
@@ -86,6 +85,7 @@ function Peca({computador, item, api, nome, componente, setPecaComputador, adici
                                 borderColor: '#2b86de',
                                 color: '#e8e5e7',
                                 transition: 'background-color 0.3s ease',
+                                width: '275px'
                             }}
                             onMouseEnter={(e) => (e.target.style.backgroundColor = '#1a6fa2')}
                             onMouseLeave={(e) => (e.target.style.backgroundColor = '#2b86de')}

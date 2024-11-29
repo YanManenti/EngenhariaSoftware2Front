@@ -84,7 +84,7 @@ function ModalPecas({children, peca = 'Peça', nome, recebePeca}) {
   }
 
   useEffect(() => {
-    if (visible) fetchValor(6, 0);
+    if (visible) fetchValor(4, 0);
   }, [visible]);
 
   const selecionaPeca = (peca) => {
@@ -125,7 +125,7 @@ function ModalPecas({children, peca = 'Peça', nome, recebePeca}) {
                 loading={loading}
                 onChange={handleChange}
                 rowKey={(value) => value.id}
-                pagination={{pageSize: 6, total: pageTotal}}
+                pagination={{pageSize: 4, total: pageTotal}}
                 bordered
                 className="custom-table"
             />
